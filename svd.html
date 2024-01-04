@@ -1,0 +1,281 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<title>SVD Compression Example - Robert Yacovelli</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<noscript>
+		<link rel="stylesheet" href="assets/css/noscript.css" />
+	</noscript>
+</head>
+
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Header -->
+		<header id="header">
+			<a href="index.html" class="logo">Robert Yacovelli</a>
+		</header>
+
+		<!-- Nav -->
+		<nav id="nav">
+			<ul class="links">
+				<li><a href="index.html">Home</a></li>
+				<li class="active"><a href="about.html">About</a></li>
+				<li><a href="contact.html">Contact</a></li>
+			</ul>
+			<ul class="icons">
+				<li><a href="https://www.linkedin.com/in/robert-yacovelli-259544259" class="icon brands fa-linkedin"
+						target="_blank" rel="noopener noreferrer"><span class="label">Linkedin</span></a></li>
+				<li><a href="https://github.com/robertyac" class="icon brands fa-github" target="_blank"
+						rel="noopener noreferrer"><span class="label">GitHub</span></a></li>
+			</ul>
+		</nav>
+
+		<!-- Main -->
+		<div id="main">
+
+			<!-- Post -->
+			<section class="post">
+				<header class="major">
+					<h1>Image Compression Techniques - SVD</h1>
+				</header>
+					<!-- image -->
+				<div class="image main"><img src="images/compression.png" alt="" /></div>
+				
+                <md-block>
+                   
+                    ```python
+                    import imageio.v2 as iio
+                    from PIL import Image
+                    import numpy as np
+                    from scipy.linalg import svd
+                    import matplotlib.pyplot as plt
+                    ```
+                    
+                    #### A) Take a photo.
+                    
+                    
+                    ```python
+                    image = Image.open("/Users/robertyacovelli/Desktop/greyscaleRobert.png") #edit the path as needed for image
+                    plt.axis('off')
+                    plt.imshow(image, cmap='gray')
+                    plt.show()
+                    ```
+                    
+                        
+                    <div><img src="images/output_2_0.png" alt="" /></div>
+                        
+                    
+                    #### B) Convert the image to a matrix
+                    
+                    
+                    ```python
+                    A = iio.imread("/Users/robertyacovelli/Desktop/greyscaleRobert.png")
+                    
+                    #size of the image matrix
+                    print('Size of the image matrix: ', A.shape)
+                    
+                    ```
+                    
+                        Size of the image matrix:  (3088, 2316)
+                    
+                    
+                    #### C) Compress the photo using the largest singular value of the SVD of A and display the corresponding image. *That is, find A1, the rank 1 approximation of A and display the image corresponding to A1.*
+                    
+                    
+                    ```python
+                    U, S, VT = svd(A, full_matrices=False)
+                    S = np.diag(S)
+                    ```
+                    
+                    
+                    ```python
+                    #reconstructing image with largest singular value
+                    r=1 #rank=1 --> 1st non-zero singular value
+                    A1 = U[:,:r] @ S[0:r,:r] @ VT [:r,:] # first r cols of U multiplied by first rxr block of S multiplied by first r columns of VT
+                    
+                    # Display the image corresponding to A1
+                    plt.imshow(A1, cmap='gray')
+                    plt.title('rank = 1')
+                    plt.axis('off')
+                    plt.show()
+                    
+                    ```
+                    
+                    <div><img src="images/output_7_0.png" alt="" /></div>
+                        
+                    
+                    
+                    As we can see when we only use the largest singular value the quality is so poor we can't even make out what it is supposed to be. Let's try using more singular values to see what this renders.
+                    
+                    #### D) Experimenting with how many singular values must be retained to have acceptable image quality.
+                    
+                    
+                    ```python
+                    #loop for each selected rank display compressed image and compression ratio and %
+                    rank = [5,15,25,50,100]
+                    for r in rank:
+                        Ak =  U[:,:r] @ S[0:r,:r] @ VT [:r,:]
+                        compressionRatio = r * (Ak.shape[0] + Ak.shape[1]) / (Ak.shape[0] * Ak.shape[1])
+                        compressionRatioPercent = 100 - round(compressionRatio * 100, 4)
+                        print(f'Compression ratio with {r} singular values:{compressionRatio} \nthis image was compressed by: {compressionRatioPercent}%')
+                       
+                        # Display the image corresponding to A1
+                        plt.imshow(Ak, cmap='gray')
+                        plt.title('rank = ' + str(r)) 
+                        plt.axis('off')
+                        plt.show()
+                    ```
+                    
+                        Compression ratio with 5 singular values:0.0037780656303972367 
+                        this image was compressed by: 99.6222%
+                    
+                    
+                    
+                        
+                    <div><img src="images/output_10_1.png" alt="" /></div>
+                        
+                    
+                    
+                        Compression ratio with 15 singular values:0.01133419689119171 
+                        this image was compressed by: 98.8666%
+                    
+                    
+                    
+                        
+                
+                    <div><img src="images/output_10_3.png" alt="" /></div>
+                        
+                    
+                    
+                        Compression ratio with 25 singular values:0.018890328151986182 
+                        this image was compressed by: 98.111%
+                    
+                    
+                    
+                    <div><img src="images/output_10_5.png" alt="" /></div>    
+                
+                        
+                    
+                    
+                        Compression ratio with 50 singular values:0.037780656303972364 
+                        this image was compressed by: 96.2219%
+                    
+                    
+                    
+                        
+                    <div><img src="images/output_10_7.png" alt="" /></div>
+                        
+                    
+                    
+                        Compression ratio with 100 singular values:0.07556131260794473 
+                        this image was compressed by: 92.4439%
+                    
+                    
+                    
+                        
+                    <div><img src="images/output_10_9.png" alt="" /></div>
+                        
+                    
+                    
+                    We see that the rank 100 approximation gives us the best combination between acceptable image quality and sizable compression of
+                    roughly 92%!
+                    
+                    ```python
+                    #subplots to print side by side 
+                    #original image
+                    plt.figure(figsize=(12, 6))
+                    plt.subplot(1, 2, 1)
+                    plt.axis('off')
+                    plt.title('Original Image')
+                    plt.imshow(A, cmap='gray')
+                    
+                    #compressed image
+                    plt.subplot(1, 2, 2)
+                    plt.axis('off')
+                    plt.title(f'Compressed Image using {r} singular values\n (compression of {compressionRatioPercent}%)')
+                    plt.imshow(Ak, cmap='gray')
+                    plt.show()
+                    ```
+            
+                    <div class="image main"><img src="images/output_13_0.png" alt="" /></div>
+                        
+            
+                </md-block>
+                    
+			</section>
+
+		</div>
+
+		<!-- Footer -->
+		<footer id="footer">
+			
+			<!-- Form that may be populated in the future? <section>
+				<form method="post" action="#">
+					<div class="fields">
+						<div class="field">
+							<label for="name">Name</label>
+							<input type="text" name="name" id="name" />
+						</div>
+						<div class="field">
+							<label for="email">Email</label>
+							<input type="text" name="email" id="email" />
+						</div>
+						<div class="field">
+							<label for="message">Message</label>
+							<textarea name="message" id="message" rows="3"></textarea>
+						</div>
+					</div>
+					<ul class="actions">
+						<li><input type="submit" value="Send Message" /></li>
+					</ul>
+				</form>
+			</section> -->
+
+			<section class="split contact">
+				<!-- <section class="alt">
+					<h3>Email</h3>
+					<p><a href = "mailto: contact@robertyac.github.io">contact@robertyac.github.io</a></p>
+				</section> -->
+				<section>
+					<h3>Social</h3>
+					<ul class="icons alt">
+						<li><a href="https://www.linkedin.com/in/robertyacovelli/"
+								class="icon brands fa-linkedin" target="_blank" rel="noopener noreferrer"><span
+									class="label">Linkedin</span></a></li>
+						<li><a href="https://github.com/robertyac" class="icon brands fa-github" target="_blank"
+								rel="noopener noreferrer"><span class="label">GitHub</span></a></li>
+					</ul>
+				</section>
+			</section>
+		</footer>
+
+		<!-- Copyright -->
+		<div id="copyright">
+			<ul>
+				<li>&copy; Robert Yacovelli</li>
+				<li>Design: <a href="https://html5up.net">HTML5 UP</a></li>
+			</ul>
+		</div>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/jquery.scrollex.min.js"></script>
+	<script src="assets/js/jquery.scrolly.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+    <!-- I added for markdown -->
+    <script type="module" src="https://md-block.verou.me/md-block.js"></script>
+
+</body>
+
+</html>
