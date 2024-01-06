@@ -2624,6 +2624,12 @@ input, select, textarea {
 			width: 100%;
 		}
 
+		.rounded-image {
+			border-radius: 100%;
+			width: 25px;  /* adjust as needed */
+			display: inline-block;  /* allows the image to shrink */
+		}
+
 			.image.fit:first-child {
 				margin-top: 0;
 			}

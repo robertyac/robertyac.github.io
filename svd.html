@@ -47,6 +47,9 @@
 					<!-- image -->
 				<div class="image main"><img src="images/compression.png" alt="" /></div>
 				
+				The goal of this section of the project for MATH 307 (Applied Linear Algebra) is to compress an image using the singular value decomposition of a matrix, 
+				the outter product form of the SVD.
+
                 <md-block>
                    
                     ```python
@@ -57,7 +60,7 @@
                     import matplotlib.pyplot as plt
                     ```
                     
-                    #### A) Take a photo.
+                    #### Step 1: Take a photo.
                     
                     
                     ```python
@@ -71,7 +74,7 @@
                     <div><img src="images/output_2_0.png" alt="" /></div>
                         
                     
-                    #### B) Convert the image to a matrix
+                    #### Step 2: Convert the image to a matrix
                     
                     
                     ```python
@@ -85,7 +88,7 @@
                         Size of the image matrix:  (3088, 2316)
                     
                     
-                    #### C) Compress the photo using the largest singular value of the SVD of A and display the corresponding image. *That is, find A1, the rank 1 approximation of A and display the image corresponding to A1.*
+                    #### Step 3: Compress the photo using the largest singular value of the SVD of A and display the corresponding image. *That is, find A1, the rank 1 approximation of A and display the image corresponding to A1.*
                     
                     
                     ```python
@@ -113,7 +116,7 @@
                     
                     As we can see when we only use the largest singular value the quality is so poor we can't even make out what it is supposed to be. Let's try using more singular values to see what this renders.
                     
-                    #### D) Experimenting with how many singular values must be retained to have acceptable image quality.
+                    #### Step 4: Experiment with how many singular values must be retained to have acceptable image quality.
                     
                     
                     ```python
